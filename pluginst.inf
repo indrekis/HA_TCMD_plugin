@@ -1,0 +1,8 @@
+[plugininstall] 
+description=FAT image unpacking plugin for Total Commander
+descriptionukr=Плагін для роботи із образами FAT для Total Commander
+type=wcx 
+file=ha.wcx 
+defaultdir=plugin\wcx\ha
+defaultextension=ha
+
