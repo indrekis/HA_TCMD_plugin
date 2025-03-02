@@ -19,4 +19,5 @@ Calling the settings dialog from command line:
 ----------------
 
 (c) 1999-2002 by Siarzhuk Zharski
+
 (c) 2025 by Oleg Farenyuk
