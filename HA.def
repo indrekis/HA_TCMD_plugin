@@ -1,0 +1,16 @@
+;This file is part of HAWCX, a archiver plugin for Windows Commander.
+;Copyright (C) 1999-2002 Siarzhuk Zharski  e-mail:imker@gmx.li
+
+EXPORTS
+	CloseArchive
+	ConfigurePacker
+	DeleteFiles
+	GetPackerCaps
+	OpenArchive
+	PackFiles
+	ProcessFile
+	ReadHeader
+	SetChangeVolProc
+	SetProcessDataProc
+  CanYouHandleThisFile
+  Settings

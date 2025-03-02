@@ -1,0 +1,54 @@
+                            Revision History:
+Legend:
+! - important information about version (MUST TO BE READ)
++ - feature added
+- - feature removed
+? - problem stay on
+* - bug fixed
+
+======================================================
+17/02/2002 ver 1.1.0
+
++ - Added support for searching for text inside HA-archives. Thank's to Christian Ghisler for adding that possibility into WinCom 5.0.
+
++ - Added support for opening archives with not only *.ha names. Also thank's to Christian Ghisler for adding that possibility into WinCom 5.0. Use Ctrl-PgDn to open such files.
+
+! - To use new features of WinComm 5.0 (search and opening archives by ID) you need to RE-REGISTER ha.wcx in WinComm preferences. Just remove it from configuration and add again. 
+
++ - Added possibility to open plugin configuration dialog from command-line. See "MANUAL" CALLING OF CONFIGURATION DIALOG" part in readme.txt for details.
+
+* - versions numeration changed. Now used 3-digits numbers instead dumb MS-like 4-digits ones.
+
+======================================================
+1/06/2000 ver 1,0,0,3 - man-fix.
+
+* - Non-significant changes in documentation. No changes in functionality !!! Thank's to Denis Sidorow for checking errors.
+
+======================================================
+13/05/2000 ver 1,0,0,2 - bugfix.
+
+* - fixed problem with archives created by Unix-versions of HA.exe. Previous versions was unable recognize Unix "machine specific information" and treates packed files as directories. Thank's to Igor Tcheretchikhin from Moscow for reporting this problem. To tell you truth - I am so lazy to correctly convert Unix-like file attributes to MSDOS one, but original HA archiver behaves absolutely like me ... 8-) Hope, you forgive me this ...
+
+======================================================
+19/02/2000 ver 1,0,0,1 - bugfix.
+
+* - directories was keep locked after packing - you couldn't remove it after packing without restart of WC. Problem is solved now.
+
++ - design of configuration dialog was slightly changed. 8-) 
+
+* - Christian by his own hands fixed bug in my code! Thank him! This bug was incorrect displaying current packing file name during compression! Fixed ... by Christian Ghisler 8-)
+
+* - Now HAWCX correctly show packing method when you try to see properties of compressed file. Compression methods is: 0:CPY 1:ASC 2:HSC. But I don't sure supported this feature by WC or not.
+ 
+* - When you tried to pack whole directories with "move files" option is on, directories was not removed. Fixed.
+
+12/19/1999 ver 1,0,0,0 - First full-functional release.
+======================================================
+There is no information available ...
+
+======================================================
+
+   (c) 1999-2002 by Siarzhuk Zharski
+
+   http://zharik.cjb.net
+   mailto: imker@gmx.li
