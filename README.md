@@ -13,6 +13,11 @@ Calling the settings dialog from command line:
 
 ```rundll32 ha.wcx64,Settings```
 
+Known problems: 
+
+- Sometimes stalls -- before unloading from memory or, sometimes -- restarting TCmd, fail to open any archive. 
+- Release 32-bit version, while checking archives (Alt-Shift-F9) skips all problems. Some undefined behavior.
+
 
 [^HASRC]: Currently, HA archiver sources are [on the github](https://github.com/l-4-l/ha) too.
 
