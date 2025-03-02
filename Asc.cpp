@@ -1,6 +1,10 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
-  Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 1999 Sergey Zharsky  e-mail: zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk   e-mail: indrekis@gmail.com
 ***********************************************************************/
 
 /***********************************************************************
@@ -35,7 +39,7 @@ void HAEngine::asc_cleanup(void)
 
 void HAEngine::tabinit(U16B t[], U16B tl, U16B ival) 
 {
-    register U16B i,j;
+    U16B i,j;
     
     for (i=tl;i<2*tl;++i) 
 		t[i]=ival;
@@ -48,7 +52,7 @@ void HAEngine::tabinit(U16B t[], U16B tl, U16B ival)
 
 void HAEngine::tscale(U16B t[], U16B tl) 
 {
-    register U16B i,j;
+    U16B i,j;
     
     for (i=(tl<<1)-1;i>=tl;--i) {
 	if (t[i]>1) t[i]>>=1;
@@ -60,7 +64,7 @@ void HAEngine::tscale(U16B t[], U16B tl)
 
 void HAEngine::tupd(U16B t[], U16B tl, U16B maxt, U16B step, U16B p) {
 
-    register S16B i;
+    S16B i;
     
     for (i=p+tl;i;i>>=1) t[i]+=step;
     if (t[1]>=maxt) tscale(t,tl);
@@ -68,7 +72,7 @@ void HAEngine::tupd(U16B t[], U16B tl, U16B maxt, U16B step, U16B p) {
 
 void HAEngine::tzero(U16B t[], U16B tl, U16B p) 
 {
-    register S16B i,step;
+    S16B i,step;
     for (i=p+tl,step=t[i];i;i>>=1) 
 		t[i]-=step;
 }
@@ -76,7 +80,7 @@ void HAEngine::tzero(U16B t[], U16B tl, U16B p)
 void HAEngine::model_init(void) 
 {
 
-    register S16B i;
+    S16B i;
     
     ces=CTSTEP;
     les=LTSTEP;
@@ -112,9 +116,9 @@ void HAEngine::ttscale(U16B con)
     if (ttab[con][1]==0) ttab[con][1]=1;
 }
 
-void HAEngine::codepair(S16B l, S16B p) 
+void HAEngine::codepair(S16B la, S16B p) 
 {
-    register U16B i,j,lt,k,cf,tot;
+    U16B i,j,lt,k,cf,tot;
     
     i=ttab[ttcon][0]+ttab[ttcon][1];
     ac_out(ttab[ttcon][0],i,i+1);
@@ -141,7 +145,7 @@ void HAEngine::codepair(S16B l, S16B p)
 	if (i!=(pmax>>1)) ac_out(j,j+1,i);
 	else ac_out(j,j+1,ccnt_asc-(pmax>>1));
     }
-    i=l-MINLEN;
+    i=la-MINLEN;
     if (i==LENCODES-1) i=SLCODES-1,j=0xffff;
     else if (i<SLCODES-1) j=0xffff; 
     else {
@@ -176,7 +180,7 @@ void HAEngine::codepair(S16B l, S16B p)
     if (ltab[LTCODES+i]==LCUTOFF) les-=LTSTEP<les?LTSTEP:les-1; 
     if (j!=0xffff) ac_out(j,j+1,LLLEN); 
     if (ccnt_asc<POSCODES) {
-	ccnt_asc+=l;
+	ccnt_asc+=la;
 	if (ccnt_asc>POSCODES) ccnt_asc=POSCODES;
     }
 }
@@ -184,7 +188,7 @@ void HAEngine::codepair(S16B l, S16B p)
 
 void HAEngine::codechar(S16B c) 
 {
-    register U16B i,lt,tot,cf;
+    U16B i,lt,tot,cf;
 
     i=ttab[ttcon][0]+ttab[ttcon][1];
     ac_out(0,ttab[ttcon][0],i+1);
@@ -263,7 +267,7 @@ void HAEngine::asc_pack(void)
 
 void HAEngine::asc_unpack(void) 
 {
-    register U16B l,p,tv,i,lt;
+    U16B li,p,tv,i,lt;
     
     swd_dinit(POSCODES);
     unpack_init();
@@ -284,29 +288,29 @@ void HAEngine::asc_unpack(void)
 			{
 				ac_in(ctab[1],ctab[1]+ces,ctab[1]+ces);
 				tv=ac_threshold_val(ectab[1]);
-				for (l=2,lt=0;;) 
+				for (li=2,lt=0;;) 
 				{
-					if (lt+ectab[l]<=tv) 
+					if (lt+ectab[li]<=tv) 
 					{
-						lt+=ectab[l];
-						++l;
+						lt+=ectab[li];
+						++li;
 					}
-					if (l>=CTCODES) 
+					if (li>=CTCODES) 
 					{
-						l-=CTCODES;
+						li-=CTCODES;
 						break;
 					}
-				    l<<=1;
+				    li<<=1;
 				}
 
-				ac_in(lt,lt+ectab[CTCODES+l],ectab[1]);
-				tzero(ectab,CTCODES,l);
+				ac_in(lt,lt+ectab[CTCODES+li],ectab[1]);
+				tzero(ectab,CTCODES,li);
 				if (ectab[1]!=0) 
 					ces+=CTSTEP;
 				else 
 					ces=0;
-				for (i=l<CPLEN?0:l-CPLEN;
-						i<(l+CPLEN>=CTCODES-1?CTCODES-1:l+CPLEN);++i) 
+				for (i=li<CPLEN?0:li-CPLEN;
+						i<(li+CPLEN>=CTCODES-1?CTCODES-1:li+CPLEN);++i) 
 				{
 					if (ectab[CTCODES+i]) 
 						tupd(ectab,CTCODES,MAXCT,1,i);
@@ -314,27 +318,27 @@ void HAEngine::asc_unpack(void)
 			}
 			else 
 			{
-				for (l=2,lt=0;;) 
+				for (li=2,lt=0;;) 
 				{
-					if (lt+ctab[l]<=tv) 
+					if (lt+ctab[li]<=tv) 
 					{
-						lt+=ctab[l];
-						l++;
+						lt+=ctab[li];
+						li++;
 					}
-					if (l>=CTCODES) 
+					if (li>=CTCODES) 
 					{
-						l-=CTCODES;
+						li-=CTCODES;
 						break;
 					}
-					l<<=1;
+					li<<=1;
 				}
-				ac_in(lt,lt+ctab[CTCODES+l],ctab[1]+ces);
+				ac_in(lt,lt+ctab[CTCODES+li],ctab[1]+ces);
 			}
-			tupd(ctab,CTCODES,MAXCT,CTSTEP,l);
-			if (ctab[CTCODES+l]==CCUTOFF) 
+			tupd(ctab,CTCODES,MAXCT,CTSTEP,li);
+			if (ctab[CTCODES+li]==CCUTOFF) 
 				ces-=CTSTEP<ces?CTSTEP:ces-1; 
 
-			swd_dchar(l);
+			swd_dchar(li);
 			if (ccnt_asc<POSCODES) 
 				++ccnt_asc;
 		}
@@ -377,12 +381,12 @@ void HAEngine::asc_unpack(void)
 					for (i=1;p;i<<=1,--p);
 					i>>=1;
 					if (i==(pmax>>1)) 
-						l=ccnt_asc-(pmax>>1);
+						li=ccnt_asc-(pmax>>1);
 					else 
-						l=i;
+						li=i;
 
-					p=ac_threshold_val(l);
-					ac_in(p,p+1,l);
+					p=ac_threshold_val(li);
+					ac_in(p,p+1,li);
 					p+=i;
 				}
 				tv=ac_threshold_val(ltab[1]+les);
@@ -390,31 +394,31 @@ void HAEngine::asc_unpack(void)
 				{
 					ac_in(ltab[1],ltab[1]+les,ltab[1]+les);
 					tv=ac_threshold_val(eltab[1]);
-					for (l=2,lt=0;;) 
+					for (li=2,lt=0;;) 
 					{
-						if (lt+eltab[l]<=tv) 
+						if (lt+eltab[li]<=tv) 
 						{
-							lt+=eltab[l];
-							++l;
+							lt+=eltab[li];
+							++li;
 						}
 
-						if (l>=LTCODES) 
+						if (li>=LTCODES) 
 						{
-							l-=LTCODES;
+							li-=LTCODES;
 							break;
 						}
-						l<<=1;
+						li<<=1;
 					}	
 
-					ac_in(lt,lt+eltab[LTCODES+l],eltab[1]);
-					tzero(eltab,LTCODES,l);
+					ac_in(lt,lt+eltab[LTCODES+li],eltab[1]);
+					tzero(eltab,LTCODES,li);
 					if (eltab[1]!=0)
 						les+=LTSTEP;
 					else 
 						les=0;
 
-					for (i=l<LPLEN?0:l-LPLEN;
-							i<(l+LPLEN>=LTCODES-1?LTCODES-1:l+LPLEN);++i) 
+					for (i=li<LPLEN?0:li-LPLEN;
+							i<(li+LPLEN>=LTCODES-1?LTCODES-1:li+LPLEN);++i) 
 					{
 						if (eltab[LTCODES+i]) 
 							tupd(eltab,LTCODES,MAXLT,1,i);
@@ -422,44 +426,44 @@ void HAEngine::asc_unpack(void)
 				}
 				else 
 				{
-					for (l=2,lt=0;;) 
+					for (li=2,lt=0;;) 
 					{
-						if (lt+ltab[l]<=tv) 
+						if (lt+ltab[li]<=tv) 
 						{
-							lt+=ltab[l];
-							++l;
+							lt+=ltab[li];
+							++li;
 						}
-						if (l>=LTCODES) 
+						if (li>=LTCODES) 
 						{
-							l-=LTCODES;
+							li-=LTCODES;
 							break;
 						}
-					    l<<=1;
+					    li<<=1;
 					}
-					ac_in(lt,lt+ltab[LTCODES+l],ltab[1]+les);
+					ac_in(lt,lt+ltab[LTCODES+li],ltab[1]+les);
 				}
 
-				tupd(ltab,LTCODES,MAXLT,LTSTEP,l);
-				if (ltab[LTCODES+l]==LCUTOFF)
+				tupd(ltab,LTCODES,MAXLT,LTSTEP,li);
+				if (ltab[LTCODES+li]==LCUTOFF)
 					les-=LTSTEP<les?LTSTEP:les-1; 
 
-				if (l==SLCODES-1) 
-					l=LENCODES-1;
+				if (li==SLCODES-1) 
+					li=LENCODES-1;
 			    else 
-					if (l>=SLCODES) 
+					if (li>=SLCODES) 
 					{
 						i=ac_threshold_val(LLLEN);
 						ac_in(i,i+1,LLLEN);
-						l=((l-SLCODES)<<LLBITS)+i+SLCODES-1;
+						li=((li-SLCODES)<<LLBITS)+i+SLCODES-1;
 					}
-				l+=3;
+				li+=3;
 				if (ccnt_asc<POSCODES) 
 				{
-					ccnt_asc+=l;
+					ccnt_asc+=li;
 					if (ccnt_asc>POSCODES) 
 						ccnt_asc=POSCODES;
 				}
-				swd_dpair(l,p);				
+				swd_dpair(li,p);				
 			}
 			else 
 			{

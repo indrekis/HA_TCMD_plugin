@@ -1,10 +1,17 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
-  Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 1999 Sergey Zharsky  e-mail: zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk e-mail: indrekis@gmail.com
 ***********************************************************************
   HAWCX : Main plugin module. 
   This code based on Christian Ghisler (support@ghisler.com) sources
 ***********************************************************************/
+
+// https://github.com/l-4-l/ha
 
 #include "StdAfx.h"
 
@@ -19,10 +26,10 @@ ArchiveRec ArchiveList[MAX_ARCHIVES+1];             /* Important: array must be 
 
 int __stdcall OpenArchive(tOpenArchiveData* ArchiveData)
 {
-	int ArcIdx;
+	int ArcIdx = -1;
 
     bool foundslot=false;
-    for (int i=1;i<=MAX_ARCHIVES;i++)
+    for (int i = 1; i<=MAX_ARCHIVES;i++)
       if(ArchiveList[i].m_pEngine==NULL) 
 	  {
         foundslot=true;
@@ -45,7 +52,7 @@ int __stdcall OpenArchive(tOpenArchiveData* ArchiveData)
 		return 0;
 	}
 	ArchiveList[ArcIdx].m_pEngine->arc_reset();
-	ArchiveList[ArcIdx].m_pEngine->SetWrapper(&ArchiveList[i]);
+	ArchiveList[ArcIdx].m_pEngine->SetWrapper(&ArchiveList[ArcIdx]); // Was i
     return ArcIdx;  /* returns pseudohandle */
 }
 
@@ -175,7 +182,7 @@ int __stdcall PackFiles(char *PackedFile,char *SubPath,char *SrcPath,
 	char **patterns;
 	char *p=AddList;
 				
-	for(patcnt=0;l=strlen(p);patcnt++,p+=l+1);
+	for(patcnt=0;l=strlen(p);patcnt++,p+=l+1); //-V559
 
 	if(!patcnt)
 		return E_NO_FILES;
@@ -187,7 +194,7 @@ int __stdcall PackFiles(char *PackedFile,char *SubPath,char *SrcPath,
 
 	p=AddList;
 
-	for(i=0;l=strlen(p);p+=l+1)
+	for(i=0;l=strlen(p);p+=l+1) //-V559
 	{
 		char *name=stripname(p);
 		if(strlen(name))
@@ -205,8 +212,11 @@ int __stdcall PackFiles(char *PackedFile,char *SubPath,char *SrcPath,
 	engine->SetWrapper(&ArchiveList[0]);
 	
 	int iret=0;
-	if(iret=engine->arc_open(PackedFile,ARC_OLD|ARC_NEW))
+	if (iret = engine->arc_open(PackedFile, ARC_OLD | ARC_NEW)) {
+		free(patterns);
+		delete engine;
 		return iret;
+	}
 
 	__try
 	{
@@ -245,7 +255,7 @@ int __stdcall DeleteFiles(char *PackedFile,char *DeleteList)
 	char *p=DeleteList;
 	char **patterns;
 	
-	for(patcnt=0;l=strlen(p);patcnt++,p+=l+1);
+	for(patcnt=0;l=strlen(p);patcnt++,p+=l+1); //-V559
 
 	if(!patcnt)
 		return E_NO_FILES;
@@ -255,20 +265,27 @@ int __stdcall DeleteFiles(char *PackedFile,char *DeleteList)
 
 	p=DeleteList;
 
-	for(i=0;l=strlen(p);p+=l+1)
+	for(i=0;l=strlen(p);p+=l+1) //-V559
 		patterns[i++]=p;
 
 	HAEngine *engine=HAEngine::NewHAEngine();
 	
 	int iret=0;
-	if(iret=engine->arc_open(PackedFile,ARC_OLD))
+	if (iret = engine->arc_open(PackedFile, ARC_OLD)) {
+		free(patterns);
+		delete engine;
 		return iret;
+	}
 
 	engine->arc_reset();
 
 	__try
 	{
-		if ((hd=engine->arc_seek())==NULL) return E_NO_FILES;
+		if ((hd = engine->arc_seek()) == NULL) {
+			free(patterns);
+			delete engine;
+			return E_NO_FILES;
+		}
 		do {
 			if(match_for_delete(patterns,patcnt,hd))
 				engine->arc_delete();

@@ -1,6 +1,10 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
-  Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 1999 Sergey Zharsky  e-mail: zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk   e-mail: indrekis@gmail.com
 ***********************************************************************/
 
 /***********************************************************************
@@ -46,20 +50,20 @@ typedef unsigned char Context[4];
 
 /* model data */
 static Context curcon;		      /* current context */
-static U16B *ht=NULL;		      /* hash table */
-static U16B *hp=NULL;		      /* hash list pointer array */
+static U16B *ht=NULL;		      /* hash table */ //-V707
+static U16B *hp=NULL;		      /* hash list pointer array */ //-V707
 static Context *con=NULL;	      /* context array */
-static unsigned char *cl=NULL;	      /* context length array */
-static unsigned char *cc=NULL;	      /* character counts */
-static U16B *ft=NULL;		      /* total frequency of context */
-static unsigned char *fe=NULL;	      /* frequencys under ESCTH in context */
+static unsigned char *cl=NULL;	      /* context length array */ //-V707
+static unsigned char *cc=NULL;	      /* character counts */ //-V707
+static U16B *ft=NULL;		      /* total frequency of context */ //-V707
+static unsigned char *fe=NULL;	      /* frequencys under ESCTH in context */ //-V707
 static U16B *elp=NULL;		      /* expire list previous pointer array */
 static U16B *eln=NULL;		      /* expire list next pointer array */
 static U16B elf,ell;		      /* first and last of expire list */
 static unsigned char *rfm=NULL;	      /* refresh counter array */
-static U16B *fa=NULL;		      /* frequency array */
-static unsigned char *fc=NULL;	      /* character for frequency array */
-static U16B *nb=NULL;		      /* next pointer for frequency array */
+static U16B *fa=NULL;		      /* frequency array */ //-V707
+static unsigned char *fc=NULL;	      /* character for frequency array */ //-V707
+static U16B *nb=NULL;		      /* next pointer for frequency array */ //-V707
 static U16B fcfbl;		      /* pointer to free frequency blocks */
 static U16B nrel;		      /* context for frequency block release */
 
@@ -113,8 +117,8 @@ U16B make_context(unsigned char cl, S16B c);
 
 void HAEngine::init_model(void) {
 
-    register S16B i;
-    S32B z,l,h,t;
+    S16B i;
+    S32B z,lv,hv,t;
     
     ht=(U16B *)malloc(HTLEN*sizeof(*ht));		
     hp=(U16B *)malloc(NUMCON*sizeof(*hp));
@@ -130,11 +134,12 @@ void HAEngine::init_model(void) {
     fa=(U16B *)malloc(NUMCFB*sizeof(*fa));
     nb=(U16B *)malloc(NUMCFB*sizeof(*nb));
     if (hp==NULL || elp==NULL || eln==NULL ||
-	cl==NULL || rfm==NULL || con==NULL ||
-	cc==NULL || ft==NULL || fe==NULL ||
-	fc==NULL || fa==NULL || nb==NULL || ht==NULL) {
-	hsc_cleanup();
-	error(1,ERR_MEM,"init_model()");
+		cl==NULL || rfm==NULL || con==NULL ||
+		cc==NULL || ft==NULL || fe==NULL ||
+		fc==NULL || fa==NULL || nb==NULL || ht==NULL) 
+	{
+		hsc_cleanup();
+		error(1,ERR_MEM,"init_model()");
     }
     maxclen=MAXCLEN;		
     iec[0]=(IECLIM>>1);
@@ -145,10 +150,10 @@ void HAEngine::init_model(void) {
     hs[0]=0;
     for (i=0;i<HTLEN;++i) ht[i]=NIL;	
     for (i=0;i<NUMCON;++i) {
-	eln[i]=i+1;
-	elp[i]=i-1;
-	cl[i]=0xff;
-	nb[i]=NIL;
+		eln[i]=i+1;
+		elp[i]=i-1;
+		cl[i]=0xff;
+		nb[i]=NIL;
     }
     elf=0;
     ell=NUMCON-1;
@@ -159,9 +164,9 @@ void HAEngine::init_model(void) {
     cmsp=0;
     for (i=0;i<256;++i) cmask[i]=0;		
     for (z=10,i=0;i<HTLEN;++i) {
-	h=z/(2147483647L/16807L);
-	l=z%(2147483647L/16807L);		
-	if ((t=16807L*l-(2147483647L%16807L)*h)>0) z=t;
+	hv=z/(2147483647L/16807L);
+	lv=z%(2147483647L/16807L);		
+	if ((t=16807L*lv-(2147483647L%16807L)*hv)>0) z=t;
 	else z=t+2147483647L;
 	hrt[i]=(U16B)z&(HTLEN-1);
     }
@@ -197,7 +202,7 @@ void HAEngine::init_unpack(void)
 
 void HAEngine::release_cfblocks(void) 
 {
-    register U16B i,j,d;
+    U16B i,j,d;
     
     do {
 	do if (++nrel==NUMCON) nrel=0; while (nb[nrel]==NIL);
@@ -239,8 +244,8 @@ void HAEngine::release_cfblocks(void)
 
 U16B HAEngine::make_context(unsigned char conlen, S16B c) 
 {
-    register S16B i;
-    register U16B nc,fp;
+    S16B i;
+    U16B nc,fp;
     
     nc=ell;
     ell=elp[nc];
@@ -292,8 +297,8 @@ void HAEngine::el_movefront(U16B cp)
 
 void HAEngine::add_model(S16B c) 
 {
-    register U16B i;
-    register S16B cp;
+    U16B i;
+    S16B cp;
     
     while (usp!=0) {
 	i=as[--usp];
@@ -332,8 +337,8 @@ void HAEngine::add_model(S16B c)
 
 U16B HAEngine::find_next(void) 
 {
-    register S16B i,k;
-    register U16B cp;
+    S16B i,k;
+    U16B cp;
     
     for (i=cslen-1;i>=0;--i) {
 	k=hs[i];
@@ -342,12 +347,16 @@ U16B HAEngine::find_next(void)
 		switch (i) {
 		  case 4:
 		    if (curcon[3]!=con[cp][3]) break;
+			[[fallthrough]];
 		  case 3:
 		    if (curcon[2]!=con[cp][2]) break;
+			[[fallthrough]];
 		  case 2:
 		    if (curcon[1]!=con[cp][1]) break;
+			[[fallthrough]];
 		  case 1:
 		    if (curcon[0]!=con[cp][0]) break;
+			[[fallthrough]];
 		  case 0:
 		    cslen=i;
 		    return cp;
@@ -384,8 +393,8 @@ U16B HAEngine::adj_escape_prob(U16B esc, U16B cp)
 
 S16B HAEngine::code_first(U16B cp, S16B c) 
 {
-    register U16B i;
-    register S16B sum,cf,tot,esc;
+    U16B i;
+    S16B sum,cf,tot,esc;
     
     sum=cf=0;
     for (i=cp;i!=NIL;i=nb[i]) {
@@ -433,8 +442,8 @@ S16B HAEngine::code_first(U16B cp, S16B c)
 
 S16B HAEngine::code_rest(U16B cp, S16B c) 
 {
-    register U16B i;
-    register S16B sum,cf,tot,esc;
+    U16B i;
+    S16B sum,cf,tot,esc;
     
     tot=sum=cf=esc=0;
     for (i=cp;i!=NIL;i=nb[i]) {
@@ -471,8 +480,8 @@ S16B HAEngine::code_rest(U16B cp, S16B c)
 
 void HAEngine::code_new(S16B c) 
 {
-    register S16B i;
-    register U16B sum,tot;
+    S16B i;
+    U16B sum,tot;
     
     sum=0;
     tot=257-cmsp;
@@ -482,11 +491,11 @@ void HAEngine::code_new(S16B c)
 
 S16B HAEngine::decode_first(U16B cp) 
 {
-    register U16B c;
-    register U16B tv;
-    register U16B i;
-    register S16B sum,tot,esc,cf;
-    register unsigned char sv;
+    U16B c;
+    U16B tv;
+    U16B i;
+    S16B sum,tot,esc,cf;
+    unsigned char sv;
 
     esc=adj_escape_prob(fe[cp],cp);
     tot=ft[cp];
@@ -542,10 +551,10 @@ S16B HAEngine::decode_first(U16B cp)
 
 S16B HAEngine::decode_rest(U16B cp) 
 {
-    register U16B c;
-    register U16B tv;
-    register U16B i;
-    register S16B sum,tot,esc,cf;
+    U16B c;
+    U16B tv;
+    U16B i;
+    S16B sum,tot,esc,cf;
     
     esc=tot=0;
     for (i=cp;i!=NIL;i=nb[i]) {
@@ -592,8 +601,8 @@ S16B HAEngine::decode_rest(U16B cp)
 
 S16B HAEngine::decode_new(void) 
 {
-    register S16B c;
-    register U16B tv,sum,tot;
+    S16B c;
+    U16B tv,sum,tot;
     
     tot=257-cmsp;
     tv=ac_threshold_val(tot);

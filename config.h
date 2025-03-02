@@ -1,6 +1,7 @@
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
-  Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 1999 Sergey Zharsky  e-mail: zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk   e-mail: indrekis@gmail.com
 ***********************************************************************
   Config.h
 ***********************************************************************/

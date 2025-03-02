@@ -1,6 +1,10 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
-  Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 1999 Sergey Zharsky  e-mail: zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk   e-mail: indrekis@gmail.com
 ***********************************************************************
   config.cpp
 ***********************************************************************/
@@ -59,7 +63,7 @@ char * GetHaDllVersion(char * lpc)
 {
  char modulePath[_MAX_PATH];
  void *pData=NULL;
- DWORD  handle;
+ DWORD  handle = -1;
  DWORD  dwSize;
  char   szName[512];
  char *lpBuffer;
@@ -71,14 +75,16 @@ char * GetHaDllVersion(char * lpc)
   if(dwSize)
   {
 	pData=malloc(dwSize);
-	GetFileVersionInfo(modulePath, handle, dwSize, pData);
-	VerQueryValue(pData, "\\VarFileInfo\\Translation", (void **)&lpBuffer, (unsigned int *)&dwSize);
-	if (dwSize!=0)
-	{
-	 wsprintf(szName, "\\StringFileInfo\\%04X%04X\\FileVersion",*((LPWORD)lpBuffer),*((LPWORD)(lpBuffer)+1));
-	 VerQueryValue(pData, szName, (void **)&lpBuffer, (unsigned int*)&dwSize);
-	 iRet=lpc;
-	 lstrcpy(lpc,lpBuffer);
+	if (pData) {
+		GetFileVersionInfo(modulePath, handle, dwSize, pData);
+		VerQueryValue(pData, "\\VarFileInfo\\Translation", (void**)&lpBuffer, (unsigned int*)&dwSize);
+		if (dwSize != 0)
+		{
+			wsprintf(szName, "\\StringFileInfo\\%04X%04X\\FileVersion", *((LPWORD)lpBuffer), *((LPWORD)(lpBuffer)+1));
+			VerQueryValue(pData, szName, (void**)&lpBuffer, (unsigned int*)&dwSize);
+			iRet = lpc;
+			lstrcpy(lpc, lpBuffer);
+		}
 	}
   }
  }
@@ -129,11 +135,19 @@ BOOL CALLBACK DialogProc(HWND hwndDlg,UINT  uMsg,WPARAM wParam,LPARAM  lParam)
 			 SendDlgItemMessage(hwndDlg,IDC_STATIC_URL,WM_SETFONT,(WPARAM)hFontURL,0);
 			 SendDlgItemMessage(hwndDlg,IDC_STATIC_VERSION,WM_SETFONT,(WPARAM)hFontBold,0);
 			 SendDlgItemMessage(hwndDlg,IDC_STATIC_MADE_IN,WM_SETFONT,(WPARAM)hFontBold,0);
+#ifndef _WIN64
 			 SetClassLong(GetDlgItem(hwndDlg,IDC_STATIC_MAIL),GCL_HCURSOR,(LPARAM)hCursor);
+#else 
+			 SetClassLongPtr(GetDlgItem(hwndDlg, IDC_STATIC_MAIL), GCLP_HCURSOR, (LONG_PTR)hCursor);
+#endif
 
 			 SetDlgItemText(hwndDlg,IDC_STATIC_VERSION,GetHaDllVersion(verStr));
 
-			 InitCommonControls();
+			 // InitCommonControls();
+			 INITCOMMONCONTROLSEX icex;
+			 icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
+			 icex.dwICC = ICC_WIN95_CLASSES; // Для підтримки всіх стандартних контролів
+			 InitCommonControlsEx(&icex);
 
 			 hwndTT=CreateWindowEx(0,TOOLTIPS_CLASS, (LPSTR) NULL,TTS_ALWAYSTIP|TTS_NOPREFIX, 
 					0,0,0,0,hwndDlg,(HMENU) NULL, hInstance, NULL);
@@ -142,16 +156,17 @@ BOOL CALLBACK DialogProc(HWND hwndDlg,UINT  uMsg,WPARAM wParam,LPARAM  lParam)
 			 ti.uFlags=TTF_IDISHWND|TTF_SUBCLASS;
             ti.hwnd = hwndDlg; 
 
-            ti.uId = (UINT) GetDlgItem(hwndDlg,IDC_STATIC_MAIL); 
+            //ti.uId = (UINT) GetDlgItem(hwndDlg,IDC_STATIC_MAIL);  // !!!
+            ti.uId = (UINT_PTR)GetDlgItem(hwndDlg, IDC_STATIC_MAIL);
             ti.lpszText = LPSTR_TEXTCALLBACK ;
              
             SendMessage(hwndTT, TTM_ADDTOOL, 0,(LPARAM)&ti);
 
-			ti.uId = (UINT) GetDlgItem(hwndDlg,IDC_STATIC_MAIL); 
+			ti.uId = (UINT_PTR) GetDlgItem(hwndDlg,IDC_STATIC_MAIL); // !!!
 			SendMessage(hwndTT, TTM_ADDTOOL, 0,(LPARAM)&ti);
-			ti.uId = (UINT) GetDlgItem(hwndDlg,IDC_STATIC_URL); 
+			ti.uId = (UINT_PTR) GetDlgItem(hwndDlg,IDC_STATIC_URL);  // !!!
 			SendMessage(hwndTT, TTM_ADDTOOL, 0,(LPARAM)&ti);
-			ti.uId = (UINT) GetDlgItem(hwndDlg,IDC_COMBO_METHOD); 
+			ti.uId = (UINT_PTR) GetDlgItem(hwndDlg,IDC_COMBO_METHOD); // !!!
 			SendMessage(hwndTT, TTM_ADDTOOL, 0,(LPARAM)&ti);
 
 			SendMessage(hwndTT, TTM_SETMAXTIPWIDTH,0,200);
@@ -180,7 +195,7 @@ BOOL CALLBACK DialogProc(HWND hwndDlg,UINT  uMsg,WPARAM wParam,LPARAM  lParam)
 					LPNMHDR lpnmhdr=(LPNMHDR)lParam;
 					if(lpnmhdr->code == TTN_NEEDTEXT)
 					{
-						UINT id;
+						UINT_PTR id; // !!!
 						LPNMTTDISPINFO lpnmtdi = (LPNMTTDISPINFO)lParam;
 						lpnmtdi->hinst=NULL;
 						if(lpnmtdi->uFlags & TTF_IDISHWND)
@@ -188,7 +203,7 @@ BOOL CALLBACK DialogProc(HWND hwndDlg,UINT  uMsg,WPARAM wParam,LPARAM  lParam)
 						else
 							id=lpnmtdi->hdr.idFrom;
 						lpnmtdi->lpszText=toolsStr;
-						LoadString(hInstance,id,toolsStr,512);
+						(void)LoadString(hInstance, id, toolsStr, 512); // !!!
 						lpnmtdi->uFlags|=TTF_DI_SETITEM;
 					}
 				}
@@ -200,7 +215,7 @@ BOOL CALLBACK DialogProc(HWND hwndDlg,UINT  uMsg,WPARAM wParam,LPARAM  lParam)
 				 char num[4];
 				 num[1]='\0';
 		   DeleteObject(hBrush);
-			num[0]=(char)('0'+(gPackMetod=SendDlgItemMessage(hwndDlg,IDC_COMBO_METHOD,CB_GETCURSEL,0,0)));
+			num[0]=(char)('0'+(gPackMetod=SendDlgItemMessage(hwndDlg,IDC_COMBO_METHOD,CB_GETCURSEL,0,0))); // ???
 			WritePrivateProfileString(SEC_NAME,COMBO_METHOD,num,INI_NAME);
 
 			DeleteObject(hFontBold);

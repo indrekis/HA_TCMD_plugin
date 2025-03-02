@@ -1,6 +1,10 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
-  Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 1999 Sergey Zharsky  e-mail: zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk   e-mail: indrekis@gmail.com
 ***********************************************************************/
 
 /***********************************************************************
@@ -30,7 +34,7 @@
 
 int inerror=0,lasterror=0;
 
-char *error_string[]={
+const char *error_string[] = {
     "Error in error handling !!!",			
     "Unknown error",
     "Command %c not implemented",	
@@ -68,8 +72,13 @@ void HAEngine::error(int fatal, int number, ...)
 {
     va_list argptr;
     
-    if (inerror) 
-		RaiseException(0,0,1,(CONST DWORD *)error_string[0]);
+    if (inerror) {
+#ifndef _WIN64
+        RaiseException(0, 0, 1, (CONST DWORD*)error_string[0]);
+#else
+		RaiseException(0, 0, 1, (CONST ULONG_PTR*)error_string[0]);
+#endif
+    }
     inerror=number;
 
     va_start(argptr,number);
@@ -82,7 +91,12 @@ void HAEngine::error(int fatal, int number, ...)
 		MessageBox(GetFocus(),errorStr,"HA Archiver plugin Error",MB_ICONWARNING);
 		return;
     }
+#ifndef _WIN64
 	RaiseException(number,0,1,(CONST DWORD *)errorStr);
+#else
+	RaiseException(number, 0, 1, (CONST ULONG_PTR*)errorStr);
+#endif
+
 }
 
 // = end of file error.cpp =

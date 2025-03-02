@@ -1,6 +1,10 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
   Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk   e-mail: indrekis@gmail.com
 ***********************************************************************/
 
 /***********************************************************************
@@ -63,7 +67,7 @@
 void HAEngine::ac_out(U16B low, U16B high, U16B tot) 
 {
    
-    register U32B r;
+    U32B r;
     
     r=(U32B)(h-l)+1;
     h=(U16B)((r*high/tot-1)+l);
@@ -184,11 +188,11 @@ void HAEngine::ac_end_encode(void) {
     ++s;
     putbit(l&0x4000);
     while (s--) {
-	putbit(~l&0x4000);
+		putbit(~l&0x4000);
     }
     if (ppat==1) {
-	flush();
-	return;
+		flush();
+		return;
     }
     while(!(ppat&0x100)) ppat<<=1;
     putbyte(ppat&0xff);
@@ -204,7 +208,7 @@ void HAEngine::ac_end_encode(void) {
 
 void HAEngine::ac_in(U16B low, U16B high, U16B tot) 
 {
-    register U32B r;
+    U32B r;
 
     r=(U32B)(h-l)+1;
     h=(U16B)((r*high/tot-1)+l);
@@ -229,7 +233,7 @@ void HAEngine::ac_in(U16B low, U16B high, U16B tot)
 
 U16B HAEngine::ac_threshold_val(U16B tot) 
 {
-    register U32B r;
+    U32B r;
     
     r=(U32B)(h-l)+1;
     return (U16B)((((U32B)(v-l)+1)*tot-1)/r);
@@ -351,8 +355,13 @@ void HAEngine::ac_init_decode(void)
     h=0xffff;
     l=0;
     gpat=0;
-    v=getbyte()<<8;
-    v|=0xff&getbyte();
+	if (v < 0) { 
+		v = 0;  // WTF як тут краще без серйозних змін
+	}
+	else {
+		v = getbyte() << 8;
+		v |= 0xff & getbyte();
+	}
 }
 
 // = end of file acoder.cpp =

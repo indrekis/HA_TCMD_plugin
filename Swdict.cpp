@@ -1,6 +1,10 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
-  Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 1999 Sergey Zharsky  e-mail: zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk   e-mail: indrekis@gmail.com
 ***********************************************************************/
 
 /***********************************************************************
@@ -29,7 +33,7 @@
 
 #define HSIZE	16384
 #define HSHIFT	3
-#define HASH_SW(p) ((b[p]^((b[p+1]^(b[p+2]<<HSHIFT))<<HSHIFT))&(HSIZE-1))
+#define HASH_SW(p) ((b[(p)]^((b[(p)+1]^(b[(p)+2]<<HSHIFT))<<HSHIFT))&(HSIZE-1))
 #define MAXCNT	1024	
 
 void HAEngine::swd_cleanup(void) 
@@ -43,7 +47,7 @@ void HAEngine::swd_cleanup(void)
 
 void HAEngine::swd_init(U16B maxl, U16B bufl) 
 {
-    register S16B i;
+    S16B i;
     
     iblen=maxl; 
     cblen=bufl;
@@ -71,7 +75,7 @@ void HAEngine::swd_init(U16B maxl, U16B bufl)
 
 void HAEngine::swd_accept(void) 
 {
-    register S16B i,j;
+    S16B i,j;
     
     j=swd_mlf-2;
     do {   		/* Relies on non changed swd_mlf !!! */
@@ -102,8 +106,8 @@ void HAEngine::swd_accept(void)
 
 void HAEngine::swd_findbest(void) 
 {
-    register U16B i,ref,cnt,ptr,start_len;
-    register S16B c;
+    U16B i,ref,cnt,ptr,start_len;
+    S16B c;
     
     i=HASH_SW(bbf);
     if ((cnt=ccnt[i]++)>MAXCNT) cnt=MAXCNT;
@@ -119,7 +123,7 @@ void HAEngine::swd_findbest(void)
 	    if (b[ptr+swd_mlf-1]==ref && 
 		b[ptr]==b[bbf] && b[ptr+1]==b[bbf+1]) {
 		{
-		    register unsigned char *p1=b+ptr+3,*p2=b+bbf+3;
+		    unsigned char *p1=b+ptr+3,*p2=b+bbf+3;
 		    for (i=3;i<bbl;++i) {
 			if (*p1++!=*p2++) break; 
 		    }
@@ -167,11 +171,11 @@ void HAEngine::swd_dinit(U16B bufl)
     bbf=0;
 }
 
-void HAEngine::swd_dpair(U16B l, U16B p) 
+void HAEngine::swd_dpair(U16B la, U16B p) 
 {
     if (bbf>p) p=bbf-1-p;
     else p=cblen-1-p+bbf;
-    while (l--) {
+    while (la--) {
 	b[bbf]=b[p];
 	putbyte(b[p]);
 	if (++bbf==cblen) bbf=0;

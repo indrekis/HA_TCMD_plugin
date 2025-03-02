@@ -1,6 +1,7 @@
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
-  Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 1999 Sergey Zharsky  e-mail: zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk   e-mail: indrekis@gmail.com
 ***********************************************************************
   HAEngine.h - class HAEngine declaration
 ***********************************************************************/
@@ -8,10 +9,16 @@
 #ifndef _HAENGINE_H_
 	#define _HAENGINE_H_
 
-typedef short int S16B;
-typedef unsigned short int U16B;
-typedef long S32B;
-typedef unsigned long U32B;
+#include <cstdint>
+
+// typedef short int S16B;
+// typedef unsigned short int U16B;
+// typedef long S32B;
+// typedef unsigned long U32B;
+typedef int16_t  S16B;
+typedef uint16_t U16B;
+typedef int32_t  S32B;
+typedef uint32_t U32B;
 
 //ASC defines
 #define POSCODES 31200
@@ -132,8 +139,8 @@ typedef struct {			/* Header of file in archive 	*/
     U32B crc;
     char path[_MAX_PATH];
     char name[_MAX_PATH];
-    unsigned short mdilen;
-    unsigned short mylen;
+	U16B mdilen;
+	U16B mylen;
 	//DWORD attr;
 	unsigned char attr;
 } Fheader;
@@ -167,14 +174,14 @@ private:
 
 	//ARCHIVE section
 	// data
-	int arcfile;
-	char arcname[_MAX_PATH];
-	struct stat arcstat;
-	unsigned arccnt;
-	int dirty,addtries;
-	U32B nextheader,thisheader,arcsize,bestpos,trypos;
-	Fheader fhdr;
-	Fheader newhdr;
+	int arcfile = 0;
+	char arcname[_MAX_PATH] = {};
+	struct stat arcstat = {};
+	unsigned arccnt = 0;
+	int dirty = 0, addtries = 0;
+	U32B nextheader = 0, thisheader = 0, arcsize = 0, bestpos = 0, trypos = 0;
+	Fheader fhdr{};
+	Fheader newhdr{};
 
 	//ARCHIVE functions - helpers
 	U32B getvalue(int len);
@@ -211,19 +218,19 @@ private:
 	void bwrite(void);
 
 	// HAIO data section
-	int ibl,ibf,obl;
-	unsigned char ib[BLOCKLEN],ob[BLOCKLEN];
-	U32B icnt,ocnt,totalsize;
+	int ibl = 0, ibf = 0, obl = 0;
+	unsigned char ib[BLOCKLEN] = {}, ob[BLOCKLEN] = {};
+	U32B icnt = 0, ocnt = 0, totalsize = 0;
 
-	int infile,outfile;
-	U32B crc;
-	U32B crctab[256];
-	unsigned char r_crc,w_crc,r_progdisp,w_progdisp;
-	int write_on,crctabok;
-	char *outname,*inname;
+	int infile = 0, outfile = 0;
+	U32B crc = 0;
+	U32B crctab[256] = {};
+	unsigned char r_crc = 0, w_crc = 0, r_progdisp = 0, w_progdisp = 0;
+	int write_on = 0, crctabok = 0;
+	char *outname = nullptr, *inname = nullptr;
 
-	void (*outspecial)(unsigned char *obuf, unsigned oblen);
-	unsigned (*inspecial)(unsigned char *ibuf, unsigned iblen);
+	void (*outspecial)(unsigned char *obuf, unsigned oblen) = nullptr;
+	unsigned (*inspecial)(unsigned char *ibuf, unsigned iblen) = nullptr;
 
 	// SWDICT section
 	void swd_init(U16B maxl, U16B bufl);	/* maxl=max len to be found  */
@@ -237,19 +244,19 @@ private:
 	void swd_dchar(S16B c);
 
 	//SWDICT data section
-	U16B swd_bpos,swd_mlf;
-	S16B swd_char;
-	U16B cblen,binb;
-	U16B bbf,bbl,inptr;
-	U16B *ccnt,*ll,*cr,*best;
-	unsigned char *b;
-	U16B blen,iblen;
+	U16B swd_bpos = 0, swd_mlf = 0;
+	S16B swd_char = 0;
+	U16B cblen = 0, binb = 0;
+	U16B bbf = 0, bbl = 0, inptr = 0;
+	U16B *ccnt = nullptr, *ll = nullptr, *cr = nullptr, *best = nullptr;
+	unsigned char *b = nullptr;
+	U16B blen = 0, iblen = 0;
 
 	//ACODER section
 	// ACODER data
-	U16B h,l,v;
-	S16B s;
-	S16B gpat,ppat;
+	U16B h = 0, l = 0, v = 0;
+	S16B s = 0;
+	S16B gpat = 0, ppat = 0;
 
 	// ACODER funcs
 	void ac_init_encode(void);
@@ -264,16 +271,16 @@ private:
 
 	// ASC Section
 	// ASC data
-	U16B ltab[2*LTCODES];
-	U16B eltab[2*LTCODES];
-	U16B ptab[2*PTCODES];
-	U16B ctab[2*CTCODES];
-	U16B ectab[2*CTCODES];
-	U16B ttab[TTORD][2];
-	U16B ccnt_asc,pmax,npt;
-	U16B ces;
-	U16B les;
-	U16B ttcon;
+	U16B ltab[2 * LTCODES] = {};
+	U16B eltab[2*LTCODES] = {};
+	U16B ptab[2*PTCODES] = {};
+	U16B ctab[2*CTCODES] = {};
+	U16B ectab[2*CTCODES] = {};
+	U16B ttab[TTORD][2] = {};
+	U16B ccnt_asc = 0, pmax = 0, npt = 0;
+	U16B ces = 0;
+	U16B les = 0;
+	U16B ttcon = 0;
 
 	// ASC function
 	// helpers

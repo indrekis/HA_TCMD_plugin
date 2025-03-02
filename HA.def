@@ -1,5 +1,6 @@
 ;This file is part of HAWCX, a archiver plugin for Windows Commander.
-;Copyright (C) 1999-2002 Siarzhuk Zharski  e-mail:imker@gmx.li
+;Copyright (C) 1999-2002 Siarzhuk Zharski  e-mail: imker@gmx.li
+;Copyright (C) 2025 Oleg Farenyuk          e-mail: indrekis@gmail.com
 
 EXPORTS
 	CloseArchive

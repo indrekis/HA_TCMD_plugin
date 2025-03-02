@@ -1,6 +1,10 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 /***********************************************************************
   This file is part of HAWCX, a archiver plugin for Windows Commander.
-  Copyright (C) 1999 Sergey Zharsky  e-mail:zharik@usa.net
+  Copyright (C) 1999 Sergey Zharsky  e-mail: zharik@usa.net
+  Copyright (C) 2025 Oleg Farenyuk   e-mail: indrekis@gmail.com
 ***********************************************************************/
 
 /***********************************************************************
@@ -89,7 +93,7 @@ Fheader *HAEngine::getheader(void)
     getstring(hd.path);
     getstring(hd.name);
     hd.mdilen=(unsigned)getvalue(1);
-    hd.mylen=hd.mdilen+20+strlen(hd.path)+strlen(hd.name);
+    hd.mylen=static_cast<decltype(hd.mylen)>(hd.mdilen+20+strlen(hd.path)+strlen(hd.name));
     char buf[255];
 	read(arcfile,buf,hd.mdilen);
 	switch(buf[0])
@@ -101,7 +105,9 @@ Fheader *HAEngine::getheader(void)
 		hd.attr=buf[1];//|(buf[2]<<8);
 		break;*/
 	default: // look like uncorrect but Harry do the same thing in
-		hd.attr=_A_ARCH;  // his MSDOS HA sources ... 8-)
+		error(0, ERR_CORRUPTED); // Old code crushes for d:\Downloads\Biblioteka_razvlekatelnoy_literatury\Stuff\Erotic\Know_how\NOAUTHOR\NOAUTH01.HA 
+		// hd.attr=_A_ARCH;  // his MSDOS HA sources ... 8-)
+		return nullptr;
 		break;
 	}
     return &hd;
@@ -143,7 +149,10 @@ void HAEngine::arc_clean(void)
 		if (lseek(arcfile,ipos,SEEK_SET)<0) error(1,ERR_SEEK,"arc_clean()");
 		for (;;) {
 			hd=getheader();
-			if (hd->ver!=0xff) break;
+			if (hd == nullptr) {
+				error(1, ERR_SEEK, "arc_clean()"); // Throws -- so next line is not executed
+			}
+			if (hd->ver!=0xff) break; //-V1004
 			ipos+=hd->clen+hd->mylen;
 			if (lseek(arcfile,ipos,SEEK_SET)<0) 
 			  error(1,ERR_SEEK,"arc_clean()");
@@ -203,6 +212,12 @@ U32B HAEngine::arc_scan(void)
 	}
 	if (lseek(arcfile,pos,SEEK_SET)<0) error(1,ERR_SEEK,"arc_seek()");
 	hd=getheader();
+	if (hd == nullptr)
+	{
+		if (arccnt != 0)
+			--arccnt;
+		return pos;
+	}
 	pos+=hd->clen+hd->mylen;
 	if (hd->ver==0xff) {
 	    dirty=1;
@@ -284,6 +299,8 @@ Fheader *HAEngine::arc_seek(void)
 	if (lseek(arcfile,nextheader,SEEK_SET)<0) 
 	  error(1,ERR_SEEK,"arc_seek()");
 	hd=getheader();
+	if (hd == nullptr)
+		return nullptr;
 	thisheader=nextheader;
 	nextheader+=hd->clen+hd->mylen;
 	if (hd->ver==0xff) dirty=1;
@@ -311,14 +328,16 @@ void HAEngine::arc_newfile(char *mdpath, char *name,struct _finddata_t *ft)
 	newhdr.ver=MYVER;
     newhdr.olen=ft->size;
 	
-	newhdr.time=ft->time_write;
+	//! Looks like 64-bit time is plane extension of the 32-bit, 
+	//! and HA does not support 64-bit time anyway -- so up to 2038 year only.
+	newhdr.time=static_cast<decltype(newhdr.time)>(ft->time_write);
 	if(mdpath)
 		strcpy(newhdr.path,(char *)md2hapath((unsigned char *)mdpath));
 	else
 		newhdr.path[0]='\0';
     strcpy(newhdr.name,(char *)md2hapath((unsigned char *)name));
     newhdr.mdilen=2;
-    newhdr.mylen=newhdr.mdilen+20+strlen(newhdr.path)+strlen(newhdr.name);
+    newhdr.mylen=static_cast<decltype(newhdr.mylen)>(newhdr.mdilen+20+strlen(newhdr.path)+strlen(newhdr.name));
     bestpos=trypos=arcsize+newhdr.mylen;
     addtries=0;
     dirty|=2;
@@ -350,8 +369,11 @@ void HAEngine::delold(void)
 	if (pos>=arcsize) break;
 	if (lseek(arcfile,pos,SEEK_SET)<0) error(1,ERR_SEEK,"delold()");
 	hd=getheader();
+	if (hd == nullptr) {
+		error(1, ERR_SEEK, "delold()"); // Throws -- so next line is not executed
+	}
 	oldpos=pos;
-	pos+=hd->clen+hd->mylen;
+	pos+=hd->clen+hd->mylen; //-V1004
 	if (hd->ver==0xff) {
 	    dirty=1;
 	    ++i;
