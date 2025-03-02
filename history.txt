@@ -7,6 +7,15 @@ Legend:
 * - bug fixed
 
 ======================================================
+02/03/2025 ver 1.2.0 beta
+
+* - Updated for compiling with the MSVC 2022. 
+
+* - Fixed several memory leaks.
+
+* - Fixed (crudely yet) processing some heavily damaged archives -- plugin crashed on them before.
+
+======================================================
 17/02/2002 ver 1.1.0
 
 + - Added support for searching for text inside HA-archives. Thank's to Christian Ghisler for adding that possibility into WinCom 5.0.
