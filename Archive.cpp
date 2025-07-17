@@ -467,6 +467,7 @@ int HAEngine::addfile(char *path, char *name,int move,int usepath)
 
 		arc_addfile();
 		close(inf);
+		inf = -1;
 
 		if (move) 
 		{
